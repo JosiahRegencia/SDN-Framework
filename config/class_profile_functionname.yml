@@ -1,0 +1,44 @@
+class_profiles :
+  1.a : 
+    description: Basic CBQ (Stream, Burst, Catch All) at Client Edge Switches
+    func_name : basic_cbq_leaves
+    qos_type : basic
+    test_case : leaves
+  1.b : 
+    description: Basic CBQ (Stream, Burst, Catch All) at Core Switch
+    func_name : basic_cbq_core
+    qos_type : basic
+    test_case : core
+  2.a : 
+    description: Source CBQ (Source Filtering) at Client Edge Switches
+    func_name : src_cbq_leaves
+    qos_type : source
+    test_case : leaves
+  2.b : 
+    description: Source CBQ (Source Filtering) at Core Switch
+    func_name : src_cbq_core
+    qos_type : source
+    test_case : core
+  3.a : 
+    description: Destination CBQ (Destination Filtering) at Client Edge Switches
+    func_name : dst_cbq_leaves
+    qos_type : destination
+    test_case : leaves
+  3.b : 
+    description: Destination CBQ (Destination Filtering) at Core Switch
+    func_name : dst_cbq_core
+    qos_type : destination
+    test_case : core
+  4.a : 
+    description: Source-Destination CBQ (Source-Destination Filtering) at Client Edge Switches
+    func_name : srcdst_cbq_leaves
+    qos_type : source-destination
+    test_case : leaves
+  4.b : 
+    description: Source-Destination CBQ (Source-Destination Filtering) at Core Switch
+    func_name : srcdst_cbq_core
+    qos_type : source-destination
+    test_case : core
+
+
+
