@@ -10,8 +10,6 @@ BASEDIR = os.getcwd()
 
 def fat_tree(net, topo):
 
-    print (net)
-
     def divider(clients, leaves):
         divs = int(float(clients)/float(leaves))
         rng = 0
@@ -117,6 +115,9 @@ def fat_tree(net, topo):
     net.addLink( server_switch, server4 )
     net.addLink( server_switch, server5 )
     net.addLink( server_switch, server6 )
+
+def twoway_fat_tree (net, topo):
+    pass
 
 
 

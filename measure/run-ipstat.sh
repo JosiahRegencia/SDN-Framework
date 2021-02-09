@@ -34,7 +34,7 @@ fi
 
 cd /home/ubuntu/thesis/SDNQoS/
 
-sudo -u ubuntu ifstat -i switch15-eth3 -t -n > /home/ubuntu/thesis/SDNQoS/test.results/ifstat-results-$usecase-$loadcase-$queuecase.csv &
+sudo -u ubuntu ifstat -i switch7-eth3 -t -n > /home/ubuntu/thesis/SDNQoS/test.results/ifstat-results-$usecase-$loadcase-$queuecase.csv &
 
 sleep $sleeptime;
 

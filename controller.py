@@ -45,7 +45,7 @@ class MySwitch(app_manager.RyuApp):
         
         self.case = CONF.case.replace("\"", "")
 
-        self.nodes_config_file = f"{BASEDIR}/pkl/net_data/usecase_{self.case}_nodes_configuration.pkl"
+        self.nodes_config_file = f"{BASEDIR}/config/custom/usecase_{self.case}_nodes_configuration.json"
         self.usecase_yml = f"{BASEDIR}/config/class_profile_functionname.yml"
         self.topo_yml = f"{BASEDIR}/config/simulate_topo.yml"
         self.nodescon_yml = f"{BASEDIR}/pkl/net_data/node_connections.pkl"
@@ -58,7 +58,8 @@ class MySwitch(app_manager.RyuApp):
             self.nodes_connect = pickle.load(pkl_con)
         
         with open(self.nodes_config_file, "rb") as pkl_config:
-            self.nodes_config = pickle.load(pkl_config)
+            self.nodes_config = json.load(pkl_config)
+            print (f"\n\n\nNODES CONFIG:\n{self.nodes_config}\n\n\n")
 
         with open(self.usecase_yml, 'rb') as yml_file:
             self.usecases = yaml.load(yml_file)['class_profiles'] # , Loader=yaml.FullLoader
@@ -149,44 +150,46 @@ class MySwitch(app_manager.RyuApp):
         #     print (f"{switch['ports']}\n")
         # print (f"\n\n")
 
-        if self.nodes_config['switches_list'][dp.id].type == "client-leaf":
+        # print (f"\n\n{self.nodes_config['switches_list']}\n\n{self.nodes_config['switches_list'][str(dp.id)]}\n\n\n\n")
 
-            for host_entry in self.nodes_config['switches_list'][dp.id].hosts_entries:
-                out_port = host_entry.port
+        if self.nodes_config['switches_list'][str(dp.id)]['type'] == "client-leaf":
+
+            for host_entry in self.nodes_config['switches_list'][str(dp.id)]['hosts_entries']:
+                out_port = host_entry['port']
                 actions = [ofp_parser.OFPActionOutput(out_port)]
                 inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=host_entry.ip)
+                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=host_entry['ip'])
                 mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                             match=match, instructions=inst, table_id=1)
 
                 dp.send_msg(mod)
 
             for client_entry in self.nodes_config['clients_list']:
-                if client_entry.switch_id != self.nodes_config['switches_list'][dp.id].id:
-                    out_port = self.nodes_config['switches_list'][dp.id].core_port
+                if client_entry['switch_id'] != self.nodes_config['switches_list'][str(dp.id)]['id']:
+                    out_port = self.nodes_config['switches_list'][str(dp.id)]['core_port']
                     actions = [ofp_parser.OFPActionOutput(out_port)]
                     inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                    match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry.ip.strip())
+                    match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry['ip'].strip())
                     mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                                 match=match, instructions=inst, table_id=1)
                     dp.send_msg(mod)
 
-            if self.nodes_config['switches_list'][dp.id].qos_type == 'none':
+            if self.nodes_config['switches_list'][str(dp.id)]['qos_type'] == 'none':
                 for server_entry in self.nodes_config['servers_list']:
-                    out_port = self.nodes_config['switches_list'][dp.id].core_port
+                    out_port = self.nodes_config['switches_list'][str(dp.id)]['core_port']
                     actions = [ofp_parser.OFPActionOutput(out_port)]
                     inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                    match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=server_entry.ip)
+                    match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=server_entry['ip'])
                     mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                                 match=match, instructions=inst, table_id=1)
                     dp.send_msg(mod)
             else:
-                self.qos_func(ev, self.nodes_config['switches_list'][dp.id], self.nodes_config)
+                self.qos_func(ev, self.nodes_config['switches_list'][str(dp.id)], self.nodes_config)
 
-        elif self.nodes_config['switches_list'][dp.id].type == "core" or self.nodes_config['switches_list'][dp.id].type == 'client-leaf-ext':
+        elif self.nodes_config['switches_list'][str(dp.id)]['type'] == "core" or self.nodes_config['switches_list'][str(dp.id)]['type'] == 'client-leaf-ext':
 
-            if len(self.nodes_config['switches_list'][dp.id].leaf_ports) > 1:
-                for leaf in self.nodes_config['switches_list'][dp.id].leaf_ports:
+            if len(self.nodes_config['switches_list'][str(dp.id)]['leaf_ports']) > 1:
+                for leaf in self.nodes_config['switches_list'][str(dp.id)]['leaf_ports']:
                     leaf_params = leaf.split(":")
                     leaf_switch_id = -1
                     leaf_switch_port = -1
@@ -199,28 +202,28 @@ class MySwitch(app_manager.RyuApp):
                             pass
                     if leaf_switch_id > 0 and leaf_switch_port > 0:
                         for client_entry in self.nodes_config['clients_list']:
-                            if client_entry.switch_id == leaf_switch_id:
+                            if client_entry['switch_id'] == leaf_switch_id:
                                 # check first if for refactor
                                 out_port = leaf_switch_port
                                 actions = [ofp_parser.OFPActionOutput(out_port)]
                                 inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry.ip)
+                                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry['ip'])
                                 mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                                             match=match, instructions=inst, table_id=1)
                                 dp.send_msg(mod)
 
-                            if self.nodes_connect[f"switch{dp.id}:{client_entry.name}"] == leaf_switch_id:
+                            if self.nodes_connect[f"switch{dp.id}:{client_entry['name']}"] == leaf_switch_id:
                                 # check first if for refactor
                                 out_port = leaf_switch_port
                                 actions = [ofp_parser.OFPActionOutput(out_port)]
                                 inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry.ip)
+                                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry['ip'])
                                 mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                                             match=match, instructions=inst, table_id=1)
                                 dp.send_msg(mod)
 
-            elif len(self.nodes_config['switches_list'][dp.id].leaf_ports) == 1:
-                leaf_params = self.nodes_config['switches_list'][dp.id].leaf_ports[0].split(":")
+            elif len(self.nodes_config['switches_list'][str(dp.id)]['leaf_ports']) == 1:
+                leaf_params = self.nodes_config['switches_list'][str(dp.id)]['leaf_ports'][0].split(":")
                 leaf_switch_id = -1
                 leaf_switch_port = -1
 
@@ -236,41 +239,41 @@ class MySwitch(app_manager.RyuApp):
                         out_port = leaf_switch_port
                         actions = [ofp_parser.OFPActionOutput(out_port)]
                         inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                        match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry.ip)
+                        match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry['ip'])
                         mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                                     match=match, instructions=inst, table_id=1)
                         dp.send_msg(mod)
 
-            if self.nodes_config['switches_list'][dp.id].qos_type == 'none':
+            if self.nodes_config['switches_list'][str(dp.id)]['qos_type'] == 'none':
                 for server_entry in self.nodes_config['servers_list']:
-                    if self.nodes_config['switches_list'][dp.id].type == "core":
-                        out_port = int(self.nodes_config['switches_list'][dp.id].server_port[0])
-                    elif self.nodes_config['switches_list'][dp.id].type == "client-leaf-ext":
-                        out_port = self.nodes_config['switches_list'][dp.id].core_port
+                    if self.nodes_config['switches_list'][str(dp.id)]['type'] == "core":
+                        out_port = int(self.nodes_config['switches_list'][str(dp.id)][str(server_port[0])])
+                    elif self.nodes_config['switches_list'][str(dp.id)]['type'] == "client-leaf-ext":
+                        out_port = self.nodes_config['switches_list'][str(dp.id)]['core_port']
                     actions = [ofp_parser.OFPActionOutput(out_port)]
                     inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                    match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=server_entry.ip)
+                    match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=server_entry['ip'])
                     mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                                 match=match, instructions=inst, table_id=1)
                     dp.send_msg(mod)
             else:
-                self.qos_func(ev, self.nodes_config['switches_list'][dp.id], self.nodes_config)
+                self.qos_func(ev, self.nodes_config['switches_list'][str(dp.id)], self.nodes_config)
 
-        elif self.nodes_config['switches_list'][dp.id].type == "server-leaf":
+        elif self.nodes_config['switches_list'][str(dp.id)]['type'] == "server-leaf":
             for client_entry in self.nodes_config['clients_list']:
-                out_port = self.nodes_config['switches_list'][dp.id].core_port
+                out_port = self.nodes_config['switches_list'][str(dp.id)]['core_port']
                 actions = [ofp_parser.OFPActionOutput(out_port)]
                 inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry.ip)
+                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=client_entry['ip'])
                 mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                             match=match, instructions=inst, table_id=1)
                 dp.send_msg(mod)
 
             for server_entry in self.nodes_config['servers_list']:
-                out_port = server_entry.port
+                out_port = server_entry['port']
                 actions = [ofp_parser.OFPActionOutput(out_port)]
                 inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=server_entry.ip)
+                match = ofp_parser.OFPMatch(in_port=in_port, eth_type=0x0800, ipv4_dst=server_entry['ip'])
                 mod = ofp_parser.OFPFlowMod(datapath=dp, buffer_id=msg.buffer_id, priority=10,
                                             match=match, instructions=inst, table_id=1)
                 dp.send_msg(mod)

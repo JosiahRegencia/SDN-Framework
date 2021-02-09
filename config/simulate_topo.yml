@@ -1,7 +1,7 @@
 topology :
   fat_tree : 
-    clients : 40
-    leaf_switch_layers : 3
+    clients : 4
+    leaf_switch_layers : 2
 
 
 

@@ -57,7 +57,7 @@ if cl_input_cp.strip() in usecases:
     
     print("Class Profile is %s (Load Configuration is %s, QoS Configuration is %s)." % (usecase, loadcase, queuecase))
 
-    config_pkl = "{}/pkl/algo/usecase_{}_exec.pkl".format(BASEDIR, usecase)
+    config_pkl = "{}/pkl/net_data/usecase_{}_exec.pkl".format(BASEDIR, usecase)
     print ('config_pkl: ', config_pkl)
     # pkl = f"{OUTDIR}/usecase_{config_data['usecase']}_nodes_configuration.pkl"
 
@@ -69,13 +69,13 @@ if cl_input_cp.strip() in usecases:
         print (config_data)
 
     execdir = "{}/scripts/custom".format(BASEDIR)
-    resdir = os.path.dirname("{}/test.results/{}-case{}".format(BASEDIR, datetimestr, usecase))
+    resdir = os.path.dirname("{0}/test.results/{1}-case{2}".format(BASEDIR, datetimestr, usecase))
     specdir = "{}-case{}".format(datetimestr, usecase)
     resdir = os.path.join(resdir, specdir)
     logsdir = "%s/logs" % (resdir)
     newlinechar ="\r\n"
 
-    print ("resdir: ", resdir)
+    print ("resdir: {}".format(resdir))
     print ("Logsdir: {}\n\n".format(logsdir))
     
     try:
@@ -88,7 +88,10 @@ if cl_input_cp.strip() in usecases:
         original_umask = os.umask(0)
         if not os.path.exists(resdir):
             print ("not exists 1")
-            os.mkdir(resdir, 0o775)
+            print (type(resdir))
+            # os.mkdir(resdir, 0o775)
+            os.makedirs(resdir, 0o775)
+            print ("{}\n\n\n".format(os.path.exists(resdir)))
             os.chown(resdir, mnuid, mngid)
         if not os.path.exists(logsdir):
             print ("not exists 2")
@@ -214,12 +217,12 @@ if cl_input_cp.strip() in usecases:
         for host in hosts:
             hostname = host.name
             if hostname.startswith("client"):
-                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.101 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.101.log &' % (BASEDIR, pingduration, datetimestr, usecase, hostname)))
-                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.102 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.102.log &' % (BASEDIR, pingduration, datetimestr, usecase, hostname)))
-                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.103 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.103.log &' % (BASEDIR, pingduration, datetimestr, usecase, hostname)))
-                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.104 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.104.log &' % (BASEDIR, pingduration, datetimestr, usecase, hostname)))
-                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.105 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.105.log &' % (BASEDIR, pingduration, datetimestr, usecase, hostname)))
-                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.106 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.106.log &' % (BASEDIR, pingduration, datetimestr, usecase, hostname)))
+                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.101 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.101.log &' % (pingduration, BASEDIR, datetimestr, usecase, hostname)))
+                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.102 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.102.log &' % (pingduration, BASEDIR, datetimestr, usecase, hostname)))
+                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.103 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.103.log &' % (pingduration, BASEDIR, datetimestr, usecase, hostname)))
+                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.104 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.104.log &' % (pingduration, BASEDIR, datetimestr, usecase, hostname)))
+                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.105 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.105.log &' % (pingduration, BASEDIR, datetimestr, usecase, hostname)))
+                info(host.cmd('sudo -u ubuntu nohup ping -i 1 -W 1 -w %s 10.0.1.106 > %s/test.results/%s-case%s/ping-results-%s-10.0.1.106.log &' % (pingduration, BASEDIR, datetimestr, usecase, hostname)))
 
         time.sleep(30)
         starttime = datetime.now()
@@ -236,7 +239,7 @@ if cl_input_cp.strip() in usecases:
                 if hostname in config_data['load_config']:
                     for x in range(0, config_data['load_config'][hostname].count("http-low-1")):
                         print ("\n\nhttp-low-1\tHost: {}".format(hostname))
-                        aboutputdir = "{}/test.results/%s-case%s" % (datetimestr, usecase)
+                        aboutputdir = "{}/test.results/{}-case{}".format(BASEDIR,datetimestr, usecase)
                         aboutputfile = "ab-results-%s-med-outfile.txt" % hostname
                         difference = int((endtime - datetime.now()).total_seconds())
                         info(host.cmd('sudo -u ubuntu nohup sh %s/scripts/custom/simulation/ab_tests-server1-med.sh %s %s %s %s %s %s %s %s %s &' % (BASEDIR, difference, aboutputfile, execdir, hostname, datetimestr, usecase, aboutputdir, queuecase, loadcase)))
@@ -244,7 +247,7 @@ if cl_input_cp.strip() in usecases:
 
                     for y in range(0, config_data['load_config'][hostname].count("http-high-1")):
                         print ("\n\nhttp-high-1\tHost: {}".format(hostname))
-                        aboutputdir = "{}/test.results/%s-case%s" % (datetimestr, usecase)
+                        aboutputdir = "{}/test.results/{}-case{}".format(BASEDIR,datetimestr, usecase)
                         aboutputfile = "ab-results-%s-high-outfile.txt" % hostname
                         difference = int((endtime - datetime.now()).total_seconds())
                         info(host.cmd('sudo -u ubuntu nohup sh %s/scripts/custom/simulation/ab_tests-server1-med.sh %s %s %s %s %s %s %s %s %s &' % (BASEDIR, difference, aboutputfile, execdir, hostname, datetimestr, usecase, aboutputdir, queuecase, loadcase)))
@@ -252,7 +255,7 @@ if cl_input_cp.strip() in usecases:
 
                     for x in range(0, config_data['load_config'][hostname].count("http-low-2")):
                         print ("\n\nhttp-low-2\tHost: {}".format(hostname))
-                        aboutputdir = "{}/test.results/%s-case%s" % (datetimestr, usecase)
+                        aboutputdir = "{}/test.results/{}-case{}".format(BASEDIR,datetimestr, usecase)
                         aboutputfile = "ab-results-%s-med-outfile.txt" % hostname
                         difference = int((endtime - datetime.now()).total_seconds())
                         info(host.cmd('sudo -u ubuntu nohup sh %s/scripts/custom/simulation/ab_tests-server3-med.sh %s %s %s %s %s %s %s %s %s &' % (BASEDIR, difference, aboutputfile, execdir, hostname, datetimestr, usecase, aboutputdir, queuecase, loadcase)))
@@ -260,7 +263,7 @@ if cl_input_cp.strip() in usecases:
 
                     for y in range(0, config_data['load_config'][hostname].count("http-high-2")):
                         print ("\n\nhttp-high-2\tHost: {}".format(hostname))
-                        aboutputdir = "{}/test.results/%s-case%s" % (datetimestr, usecase)
+                        aboutputdir = "{}/test.results/{}-case{}".format(BASEDIR,datetimestr, usecase)
                         aboutputfile = "ab-results-%s-high-outfile.txt" % hostname
                         difference = int((endtime - datetime.now()).total_seconds())
                         info(host.cmd('sudo -u ubuntu nohup sh %s/scripts/custom/simulation/ab_tests-server3-med.sh %s %s %s %s %s %s %s %s %s &' % (BASEDIR, difference, aboutputfile, execdir, hostname, datetimestr, usecase, aboutputdir, queuecase, loadcase)))
@@ -268,15 +271,16 @@ if cl_input_cp.strip() in usecases:
 
                     for x in range(0, config_data['load_config'][hostname].count("http-low-3")):
                         print ("\n\nhttp-low-3\tHost: {}".format(hostname))
-                        aboutputdir = "{}/test.results/%s-case%s" % (datetimestr, usecase)
+                        aboutputdir = "{}/test.results/{}-case{}".format(BASEDIR,datetimestr, usecase)
                         aboutputfile = "ab-results-%s-med-outfile.txt" % hostname
+                        print ("\n\n\nAB DST: {}\n{}\n\n\n".format(aboutputdir, aboutputfile))
                         difference = int((endtime - datetime.now()).total_seconds())
                         info(host.cmd('sudo -u ubuntu nohup sh %s/scripts/custom/simulation/ab_tests-server5-med.sh %s %s %s %s %s %s %s %s %s &' % (BASEDIR, difference, aboutputfile, execdir, hostname, datetimestr, usecase, aboutputdir, queuecase, loadcase)))
                         print('ab-low: %s %s' % (hostname, datetimestr))
 
                     for y in range(0, config_data['load_config'][hostname].count("http-high-3")):
                         print ("\n\nhttp-high-3\tHost: {}".format(hostname))
-                        aboutputdir = "{}/test.results/%s-case%s" % (datetimestr, usecase)
+                        aboutputdir = "{}/test.results/{}-case{}".format(BASEDIR,datetimestr, usecase)
                         aboutputfile = "ab-results-%s-high-outfile.txt" % hostname
                         difference = int((endtime - datetime.now()).total_seconds())
                         info(host.cmd('sudo -u ubuntu nohup sh %s/scripts/custom/simulation/ab_tests-server5-med.sh %s %s %s %s %s %s %s %s %s &' % (BASEDIR, difference, aboutputfile, execdir, hostname, datetimestr, usecase, aboutputdir, queuecase, loadcase)))
