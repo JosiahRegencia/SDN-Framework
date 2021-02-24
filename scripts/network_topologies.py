@@ -40,7 +40,7 @@ def fat_tree(net, topo):
 
         for i in range(1, layers+1):
             layer_switches = []
-            for j in range(0, switches_count):
+            for j in range(0, int(switches_count)):
                 switch_num = keys.pop(0)
                 layer_switches.append(switches[switch_num])
             fat_tree[i] = layer_switches
@@ -78,16 +78,11 @@ def fat_tree(net, topo):
         else:
             index = index + 1
             net.addLink( clients[i], switches[index+1])
-
-    print ("\n\n\n")
-    print (switches[1].name)
-    
     
     fat_tree = switch_layers(layers, leaf_switches_cnt, switches)
     print (fat_tree)
     core_switch = switches[(int(fat_tree[layers][1].name.split('switch')[1])+1)]
     server_switch = switches[(int(fat_tree[layers][1].name.split('h')[1])+2)]
-    print ("\n\n\n")
 
     for i in range(1, layers):
         ranges = divider(len(fat_tree[i]), len(fat_tree[i+1]))
@@ -116,9 +111,18 @@ def fat_tree(net, topo):
     net.addLink( server_switch, server5 )
     net.addLink( server_switch, server6 )
 
-def twoway_fat_tree (net, topo):
-    pass
+def twoway_linear(net, topo):
+    left_host = net.addHost('LeftHost')
+    right_host = net.addHost('RightHost')
 
+    left_switch = net.addSwitch('src1')
+    right_switch = net.addSwitch('dst2')
+
+    core_switch = net.addSwitch('cs3')
+
+    net.addLink(left_host, left_switch)
+    net.addLink(right_host, right_switch)
+    net.addLink(left_switch, right_switch)
 
 
 

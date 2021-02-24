@@ -144,14 +144,6 @@ class MySwitch(app_manager.RyuApp):
                                     priority=10, match=match, instructions=inst, table_id=1)
         dp.send_msg(mod)
 
-        # response = requests.get(f"http://localhost:8080/v1.0/topology/switches")
-        # # print (response.json()[0])
-        # for switch in response.json():
-        #     print (f"{switch['ports']}\n")
-        # print (f"\n\n")
-
-        # print (f"\n\n{self.nodes_config['switches_list']}\n\n{self.nodes_config['switches_list'][str(dp.id)]}\n\n\n\n")
-
         if self.nodes_config['switches_list'][str(dp.id)]['type'] == "client-leaf":
 
             for host_entry in self.nodes_config['switches_list'][str(dp.id)]['hosts_entries']:

@@ -3,6 +3,8 @@ topology :
     details :
       clients : number of client hosts in the network topology
       leaf_switch_layers : number of client leaf switch layers
+  twoway_linear:
+    details : sample topo for prototype
 
 
 

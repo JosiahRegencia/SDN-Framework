@@ -1,7 +1,6 @@
 topology :
-  fat_tree : 
-    clients : 4
-    leaf_switch_layers : 2
+  twoway_linear:
+    details : sample topo for prototype
 
 
 

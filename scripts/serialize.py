@@ -26,7 +26,7 @@ with open(topo_yml) as yml_file:
 		print (topo)
 		pkl = f"{TOPO_OUTDIR}/topo_{topo}.pkl"
 		with open(pkl, 'wb') as pkl_file:
-			pickle.dump(eval(topo), pkl_file, fix_imports=True, protocol=2)
+			pickle.dump(eval(topo), pkl_file, pickle.DEFAULT_PROTOCOL)
 
 
 
