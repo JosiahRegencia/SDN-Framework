@@ -1,6 +1,7 @@
-topology :
+ topology :
   twoway_linear:
-    details : sample topo for prototype
+    details : 
+      clients : 2
 
 
 

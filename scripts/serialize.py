@@ -23,7 +23,7 @@ with open(topo_yml) as yml_file:
 	print (yml_data)
 
 	for topo in yml_data['topology']:
-		print (topo)
+		print (f"TOPO: {topo}")
 		pkl = f"{TOPO_OUTDIR}/topo_{topo}.pkl"
 		with open(pkl, 'wb') as pkl_file:
 			pickle.dump(eval(topo), pkl_file, pickle.DEFAULT_PROTOCOL)

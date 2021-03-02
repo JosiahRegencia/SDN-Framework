@@ -20,6 +20,8 @@ import yaml
 import pickle
 import pyshark
 
+from scapy.all import *
+
 logging.basicConfig(level=logging.DEBUG,
                     filename='execute.log', 
                     filemode='w',
@@ -27,7 +29,16 @@ logging.basicConfig(level=logging.DEBUG,
                     datefmt='%H:%M:%S')
 
 
+global pkt_seq
+pkt_seq = 0
 
+def pkt_callback(pkt):
+    # pkt.show()
+    global pkt_seq
+    pkt_seq = pkt_seq + 1
+    print (pkt_seq)
+
+sniff(iface="src1-eth1", prn=pkt_callback)
 
 
         

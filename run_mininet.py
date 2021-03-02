@@ -22,16 +22,10 @@ def create_network():
     net.addController('c0', controller=RemoteController)
 
     with open(TOPOYML, 'rb') as yml_file:
-        print (f"\n\n{TOPOYML}\n\n")
         topo = yaml.load(yml_file, Loader=yaml.FullLoader)
 
-    print ("topo", topo)
-
-   # key, value = topo['topology'].items()[0] # Python2
     [[key,value]] = topo['topology'].items()  # Python3
-    print ("key", key)
     topo_pkl = f"{BASEDIR}/pkl/topo/topo_{key}.pkl"
-    print ('topo_pkl', topo_pkl)
 
     with open(topo_pkl, 'rb') as func_pkl:
         func_topo = pickle.load(func_pkl)
