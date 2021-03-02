@@ -1,4 +1,4 @@
-from qos_test_cases import *
+from sdn_algorithms import *
 
 BASEDIR = os.getcwd()
 QOS_OUTDIR = f"{BASEDIR}/pkl/algo"
@@ -15,6 +15,7 @@ for case in yml_data['class_profiles']:
         pickle.dump(eval(yml_data['class_profiles'][case]['func_name']), pkl_file, pickle.DEFAULT_PROTOCOL)
 
 from network_topologies import *
+
 TOPO_OUTDIR = f"{BASEDIR}/pkl/topo"
 topo_yml = f"{BASEDIR}/config/topology_definitions.yml"
 

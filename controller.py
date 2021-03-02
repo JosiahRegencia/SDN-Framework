@@ -23,13 +23,13 @@ from ryu.lib.packet import ethernet
 from ryu.lib.packet import ether_types
 from ryu import cfg
 
-from scripts import qos_test_cases
+from scripts import sdn_algorithms
 
 import logging, time, sys
 import csv, operator, os 
 import pickle, yaml, json
 
-sys.modules['qos_test_cases'] = qos_test_cases
+sys.modules['sdn_algorithms'] = sdn_algorithms
 
 BASEDIR = os.getcwd()
 
